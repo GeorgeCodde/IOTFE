@@ -78,9 +78,15 @@
             ></el-table-column>
             <el-table-column label="Actions">
               <div slot-scope="{ row, $index }">
+
+                <el-tooltip
+                  content="Saver Status Indacator"
+                >
+                  <i class="fas fa-database" :class="{'text-success' : row.saverRule, 'text-dark' : !row.saverRule } "></i>
+                </el-tooltip>
+
                 <el-tooltip
                   content="Database Saver"
-                  effect="Light"
                   :open-delay="300"
                   placement="top"
                 >
@@ -124,7 +130,8 @@
         </div>
       </card>
     </div>
-
+    
+    
     <!-- Impreción de el objeto Dispositivos -->
     <!-- <pre>
       {{ devices }}
@@ -133,10 +140,10 @@
   </div>
 </template>
 
+
 <script>
 import { Form, Table, TableColumn } from "element-ui";
 import { Select, Option } from "element-ui";
-
 export default {
   components: {
     [Table.name]: Table,
@@ -148,6 +155,7 @@ export default {
     return {
       devices: [
         {
+          
           name: "Home",
           dId: "8888",
           teplateName: "Power Sensor",

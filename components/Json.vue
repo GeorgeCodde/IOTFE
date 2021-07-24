@@ -38,10 +38,10 @@ export default {
     return {
       vscodeTunedComments: {
         "editor.tokenColorCustomizations": {
-          textMateRules: [
-            {
+          textMateRules: [    
+            { 
               scope: "comment.line",
-              settings: {
+                settings: {
                 fontStyle: "bold italic",
                 foreground: "#2bff63cd",
               },
