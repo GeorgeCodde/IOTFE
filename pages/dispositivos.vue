@@ -64,7 +64,7 @@
           <h4 class="card-title">Add new Device</h4>
         </div>
         <div class="row">
-          <el-table :data="devices">
+          <el-table :data="$store.state.devices">
             <el-table-column label="#" min-width="50" align="center">
               <div slot-scope="{ row, $index }">
                 {{ $index + 1 }}
@@ -73,16 +73,19 @@
             <el-table-column prop="name" label="Name"> </el-table-column>
             <el-table-column prop="dId" label="Device Id"> </el-table-column>
             <el-table-column
-              prop="teplateName"
+              prop="templateName"
               label="Template"
             ></el-table-column>
             <el-table-column label="Actions">
               <div slot-scope="{ row, $index }">
-
-                <el-tooltip
-                  content="Saver Status Indacator"
-                >
-                  <i class="fas fa-database" :class="{'text-success' : row.saverRule, 'text-dark' : !row.saverRule } "></i>
+                <el-tooltip content="Saver Status Indacator">
+                  <i
+                    class="fas fa-database"
+                    :class="{
+                      'text-success': row.saverRule,
+                      'text-dark': !row.saverRule,
+                    }"
+                  ></i>
                 </el-tooltip>
 
                 <el-tooltip
@@ -130,21 +133,20 @@
         </div>
       </card>
     </div>
-    
-    
+
     <!-- Impreción de el objeto Dispositivos -->
     <!-- <pre>
       {{ devices }}
     </pre> -->
-    <Json :value="devices"> </Json>
+    <Json :value="$store.state.devices"> </Json>
   </div>
 </template>
-
 
 <script>
 import { Form, Table, TableColumn } from "element-ui";
 import { Select, Option } from "element-ui";
 export default {
+  middleware: "authenticated",
   components: {
     [Table.name]: Table,
     [TableColumn.name]: TableColumn,
@@ -152,36 +154,44 @@ export default {
     [Select.name]: Select,
   },
   data() {
-    return {
-      devices: [
-        {
-          
-          name: "Home",
-          dId: "8888",
-          teplateName: "Power Sensor",
-          emplateId: "98564554654545445kljkjlkkj",
-          saverRule: false,
-        },
-        {
-          name: "Ofice",
-          dId: "7777",
-          teplateName: "Power Sensor",
-          emplateId: "98564554654545445kljkjlkkj",
-          saverRule: true,
-        },
-        {
-          name: "Granja",
-          dId: "9999",
-          teplateName: "Power Sensor",
-          emplateId: "98564554654545445kljkjlkkj",
-          saverRule: false,
-        },
-      ],
-    };
+    return {};
+  },
+  mounted() {
+    this.$store.dispatch("getDevices");
   },
   methods: {
     deleteDevice(device) {
       alert("Deleting " + device.name);
+      const axiosHeader = {
+        headers: {
+          token: this.$store.state.auth.token,
+        },
+        params: {
+          dId: device.dId,
+        },
+      };
+
+      this.$axios
+        .delete("/device", axiosHeader)
+        .then((res) => {
+          console.log(res.data);
+          if (res.data.status == "success") {
+            this.$notify({
+              type: "success",
+              icon: "tim-icons icon-check-2",
+              message: device.name + " deleted!",
+            });
+            this.$store.dispatch("getDevices");
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          this.$notify({
+            type: "danger",
+            icon: "tim-icons icon-alert-circle-exc",
+            message: " Error deleting " + device.name,
+          });
+        });
     },
     updateSaverRuleStatus(index) {
       this.devices[index].saverRule = !this.devices[index].saverRule;
